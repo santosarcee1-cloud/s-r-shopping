@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html style="margin:0;padding:0;">
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    :root {
+        --bg: #fefcf8;
+        --card: #ffffff;
+        --text: #0f172a;
+        --muted: #64748b;
+        --accent: #004b93;
+        --accent-soft: rgba(0, 75, 147, 0.10);
+        --accent2: #ea580c;
+        --accent2-soft: rgba(234, 88, 12, 0.10);
+        --border: rgba(15, 23, 42, 0.07);
+        --success: #059669;
+        --danger: #dc2626;
+    }
+    * { font-family: 'Quicksand', Arial, sans-serif; box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+    
+    /* --- SEARCH BAR STYLES --- */
+    .search-container {
+        margin-bottom: 20px;
+        position: relative;
+    }
+    .search-input {
+        width: 100%;
+        padding: 12px 16px 12px 44px;
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        font-size: 15px;
+        background: #fff;
+        transition: all 0.2s;
+    }
+    .search-input:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+    .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted);
+        width: 20px;
+        height: 20px;
+    }
+    .no-results {
+        text-align: center;
+        padding: 30px;
+        color: var(--muted);
+        font-size: 15px;
+        grid-column: 1 / -1;
+    }
+    .product-card.hidden {
+        display: none;
+    }
+    /* --- END SEARCH STYLES --- */
+    
+    .product-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 14px;
+        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        display: flex;
+        flex-direction: column;
+    }
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        border-color: var(--accent);
+    }
+    .product-card img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 12px;
+        background: #f1f5f9;
+    }
+    .add-btn {
+        width: 100%;
+        background: var(--accent-soft);
+        color: var(--accent);
+        border: 1px solid var(--accent);
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.15s;
+        margin-top: auto;
+    }
+    .add-btn:hover {
+        background: var(--accent);
+        color: #fff;
+    }
+    .cart-section {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+    .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+        gap: 10px;
+    }
+    .cart-item:last-child { border-bottom: none; }
+    .remove-btn {
+        background: rgba(220, 38, 38, 0.1);
+        color: var(--danger);
+        border: 1px solid rgba(220, 38, 38, 0.3);
+        padding: 5px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.15s;
+    }
+    .remove-btn:hover {
+        background: var(--danger);
+        color: #fff;
+    }
+    .checkout-btn {
+        width: 100%;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        padding: 13px;
+        border-radius: 10px;
+        margin-top: 15px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+    .checkout-btn:hover { background: #003a73; }
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-content {
+        background: var(--card);
+        padding: 28px;
+        border-radius: 14px;
+        width: 100%;
+        max-width: 460px;
+        max-height: 90vh;
+        overflow-y: auto;
+        border: 1px solid var(--border);
+    }
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text);
+    }
+    .form-group input, .form-group textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        background: #fff;
+        transition: border-color 0.15s;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .form-group textarea { resize: vertical; min-height: 75px; }
+    .error-text {
+        color: var(--danger);
+        font-size: 12px;
+        margin-top: 4px;
+        display: none;
+    }
+    .cancel-btn {
+        flex: 1;
+        background: #f3f4f6;
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+    .cancel-btn:hover { background: #e5e7eb; }
+    .proceed-btn {
+        flex: 1;
+        background: var(--success);
+        color: #fff;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+    .proceed-btn:hover { background: #047857; }
+    .category-chip {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    .cat-dairy { background: rgba(59, 130, 246, 0.12); color: #1d4ed8; }
+    .cat-meat { background: rgba(220, 38, 38, 0.10); color: #b91c1c; }
+    .cat-bakery { background: rgba(234, 88, 12, 0.12); color: #c2410c; }
+    .cat-frozen { background: rgba(6, 182, 212, 0.12); color: #0e7490; }
+    .cat-household { background: rgba(107, 114, 128, 0.12); color: #4b5563; }
+    .cat-beverage { background: rgba(139, 92, 246, 0.12); color: #6d28d9; }
+    .cat-pantry { background: rgba(5, 150, 105, 0.12); color: #047857; }
+    .cat-health { background: rgba(236, 72, 153, 0.12); color: #be185d; }
+    .cat-alcohol { background: rgba(139, 92, 246, 0.15); color: #6d28d9; }
+    .cat-baby { background: rgba(244, 114, 182, 0.15); color: #be185d; }
+    .cat-pet { background: rgba(245, 158, 11, 0.15); color: #b45309; }
+    .cat-snacks { background: rgba(239, 68, 68, 0.12); color: #b91c1c; }
+    .empty-cart {
+        text-align: center;
+        color: var(--muted);
+        padding: 24px 12px;
+        font-size: 14px;
+    }
+    .price-tag {
+        color: var(--accent);
+        font-weight: 700;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+    .product-name {
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 6px;
+        line-height: 1.4;
+        min-height: 40px;
+    }
+    .header-banner {
+        background: linear-gradient(135deg, var(--accent) 0%, #0066cc 100%);
+        color: #fff;
+        padding: 32px 20px;
+        text-align: center;
+        border-radius: 0 0 20px 20px;
+        margin-bottom: 28px;
+    }
+    .section-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .icon-svg { width: 22px; height: 22px; display: inline-block; }
+    .sticky-cart {
+        position: sticky;
+        top: 20px;
+    }
+    .copy-box {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+        margin: 10px 0;
+        font-size: 12px;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+    .copy-btn {
+        background: var(--accent-soft);
+        color: var(--accent);
+        border: none;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 8px;
+    }
+    .copy-btn:hover {
+        background: var(--accent);
+        color: #fff;
+    }
+    @media (max-width: 900px) {
+        .main-grid { grid-template-columns: 1fr !important; }
+        .sticky-cart { position: static; }
+    }
+</style>
+</head>
+<body>
+    <!-- Header Banner -->
+    <div class="header-banner">
+        <div style="font-size:32px;font-weight:700;margin-bottom:6px;letter-spacing:-0.5px;">
+            S&amp;R Membership Shopping
+        </div>
+        <div style="font-size:15px;opacity:0.9;">
+            <span id="product-count">28</span> Produkto — Malaking Tipid, De-Kalidad
+        </div>
+    </div>
+    <div style="max-width:1280px;margin:0 auto;padding:0 20px 40px;">
+        <div class="main-grid" style="display:grid;grid-template-columns:2fr 1fr;gap:28px;">
+            
+            <!-- Products Section -->
+            <div>
+                <div class="section-title">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);">
+                        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <path d="M16 10a4 4 0 01-8 0"/>
+                    </svg>
+                    Lahat ng Produkto
+                </div>
+
+                <!-- 🔍 SEARCH BAR -->
+                <div class="search-container">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text" id="search-input" class="search-input" placeholder="Maghanap ng produkto...">
+                </div>
+                <!-- END SEARCH BAR -->
+
+                <div id="products-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
+                    <!-- Products will be rendered by JS -->
+                </div>
+            </div>
+            <!-- Cart Section -->
+            <div class="sticky-cart">
+                <div class="cart-section">
+                    <div class="section-title" style="font-size:18px;margin-bottom:14px;">
+                        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);width:20px;height:20px;">
+                            <circle cx="9" cy="21" r="1"/>
+                            <circle cx="20" cy="21" r="1"/>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
+                        </svg>
+                        Iyong Kariton
+                    </div>
+                    
+                    <div id="cart-items">
+                        <p class="empty-cart">Wala pang laman ang kariton</p>
+                    </div>
+                    
+                    <div style="margin-top:16px;padding-top:14px;border-top:2px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-weight:600;color:var(--muted);">Kabuuan:</span>
+                        <span style="font-size:22px;font-weight:700;color:var(--accent);">
+                            &#8369;<span id="total-price">0.00</span>
+                        </span>
+                    </div>
+                    
+                    <button class="checkout-btn" id="checkout-btn">Mag-Order Ngayon</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Confirmation Modal with Copy -->
+    <div class="modal-overlay" id="info-modal">
+        <div class="modal-content">
+            <h3 style="margin:0 0 20px 0;color:var(--accent);text-align:center;font-size:20px;">
+                Impormasyon sa Pagpapadala
+            </h3>
+            
+            <div class="form-group">
+                <label for="fullname">Buong Pangalan *</label>
+                <input type="text" id="fullname" placeholder="Hal. Juan Dela Cruz">
+                <p class="error-text" id="name-error">Ilagay ang iyong pangalan</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="address">Buong Tirahan *</label>
+                <textarea id="address" placeholder="Kalye, Barangay, Lungsod, Probinsya"></textarea>
+                <p class="error-text" id="address-error">Ilagay ang iyong tirahan</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Numero ng Telepono *</label>
+                <input type="tel" id="phone" placeholder="Hal. 09171234567">
+                <p class="error-text" id="phone-error">Ilagay ang tamang numero ng telepono</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="membership">S&amp;R Membership Number (opsyonal)</label>
+                <input type="text" id="membership" placeholder="Hal. 1234567">
+            </div>
+            
+            <div style="display:flex;gap:10px;margin-top:20px;">
+                <button class="cancel-btn" id="cancel-btn">Bumalik</button>
+                <button class="proceed-btn" id="proceed-payment">Tuloy sa Pag-order</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Order Summary Modal -->
+    <div class="modal-overlay" id="summary-modal">
+        <div class="modal-content">
+            <h3 style="margin:0 0 15px 0;color:var(--success);text-align:center;font-size:20px;">
+                ✅ Order Nakatala!
+            </h3>
+            
+            <p style="text-align:center;margin-bottom:15px;">Kopyahin ang buod sa ibaba at i-paste sa Messenger:</p>
+            
+            <div class="copy-box" id="order-summary-text"></div>
+            
+            <button class="copy-btn" id="copy-summary-btn" style="width:100%;">
+                📋 Kopyahin ang Buod
+            </button>
+            
+            <div style="display:flex;gap:10px;margin-top:20px;">
+                <button class="cancel-btn" id="close-summary-btn">Isara</button>
+                <button class="proceed-btn" id="open-messenger-btn">💬 Pumunta sa Messenger</button>
+            </div>
+        </div>
+    </div>
+<!-- EmailJS Library -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+(function() {
+    // ==============================================
+    // CONFIGURATION — PALITAN ANG MGA NAKASAAD DITO
+    // ==============================================
+    const MESSENGER_LINK = 'https://www.facebook.com/arcee.santos.14'; 
+    const EMAILJS_PUBLIC_KEY = '_weUCF_qXYkfbQjRa';
+    const EMAILJS_SERVICE_ID = 'Jh5tBtuBaT56RkT78k6kh';
+    const EMAILJS_TEMPLATE_ID = 'template_vmi3ypn';
+    // ==============================================
+    
+    if (EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'pk_xxxxxxxxxxxx') {
+        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    }
+    
+    // Products Data — 28 items
+    const products = [
+        { id: 1, name: "Pringles Original (149g)", price: 108, category: "snacks", catLabel: "Chips", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTS9Oub4AIrHQb7gPUT8-yyVZkOw-LTGKcNI6OfnLO8Lg&s=10" },
+        { id: 2, name: "Meiji Choco Baby (102g)", price: 159, category: "snacks", catLabel: "Chocolates", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdR8WLxEMm-z3xvG2BIhs5tbzoHQGROvcEPSrbuZf5qg&s=10" },
+        { id: 3, name: "Toblerone Tiny (200g)", price: 239, category: "snacks", catLabel: "Chocolates", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvnxNTLnTeRF489Rm9Yhf466MzXHcjY8vQ-Lf6OGS5dg&s=10" },
+        { id: 4, name: "Pik-Nik Original (396g)", price: 235, category: "snacks", catLabel: "Chips", img: "https://www.snrshopping.com/upload/product_details/5fa8ffc5689ee_1604911045.jpg" },
+        { id: 5, name: "Samyang Hot Chicken Ramen", price: 84, category: "pantry", catLabel: "Noodles", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREKX9h2-ZFt_atvZkkHL0YRkxn3MftVrotrRmKx_AJyQ&s=10" },
+        { id: 6, name: "Samyang Buldak Swicy (105g)", price: 84, category: "pantry", catLabel: "Noodles", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvFtvVNOwXSFKS1ToiFfgaH6lBfA5yegI2pAn0oXXSiA&s=10" },
+        { id: 7, name: "Samyang Hot Chicken Ramen Cheese Bowl (105g)", price: 84, category: "pantry", catLabel: "Noodles", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7ZvdV41OItKYlN456BvAHHvqqB9WPOq2iRGQRXjddww&s=10" },
+        { id: 8, name: "Samyang Hot Chicken Ramen Carbonara Bowl (105g)", price: 84, category: "pantry", catLabel: "Noodles", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIuIj9GlTVkCnn9ZRHnUNJng76UiHAyCA71gr5KyJHVQ&s=10" },
+        { id: 9, name: "Lotte Luncheon Meat (340g)", price: 134, category: "pantry", catLabel: "Canned Goods", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrvdj7RBy-9hpxDeT8c_VQRCxkRvfCw7bdFQCqYqxCNg&s=10" },
+        { id: 10, name: "Member's Value Hazelnut Spread with Cocoa (1kg)", price: 399, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCCz0SS_z4iUOZaC9E-yEIR0lqQ1KTT6CmUicRspLAsQ&s=10" },
+        { id: 11, name: "Member's Value Real Mayonnaise (1L)", price: 279, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9aIbs8r_gLzu2_n2dcbqjiVDoKj6c5pbXwDdfzqveMw&s=10" },
+        { id: 12, name: "Member's Value All Purpose Dressing (1L)", price: 175, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQg65a_8Igu2gYnGGwTS-1MXo0aJOIaCnAI2o8ITGLSxA&s=10" },
+        { id: 13, name: "Heinz Tomato Ketchup (1.25kg)", price: 299, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXXS0oTDDLjyl4P7mTeStstdpSuzLPgaZWcHx9sPoeTA&s=10" },
+        { id: 14, name: "Member's Value Peanut Butter (1.3kg)", price: 279, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQg_tJl9Kljj5q40nzIJUtY61Ddt2i0YHFxzD_hGLadcw&s=10" },
+        { id: 15, name: "Member's Value Coffee Creamer (1kg)", price: 176, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkEdn88U3C6glixjzGT9t3IRgZJj7F3eRZoGy-KFvrog&s=10" },
+        { id: 16, name: "Member's Value Tomato Ketchup (907g)", price: 189, category: "pantry", catLabel: "Pantry Essentials", img: "https://www.snrshopping.com/upload/product/Member---s-Value-Tomato-Ketchup-907g-5086/Members%20Value%20Tomato%20Ketchup%20907g-TkuyA2GzG4.png" },
+        { id: 17, name: "Member's Value Vegetable Oil (5L)", price: 599, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu1Z9OmcVEctk-KVparq04Axy7i82kSTWWohkK17RDNg&s=10" },
+        { id: 18, name: "Prem Corned Beef (340g)", price: 259, category: "pantry", catLabel: "Canned Goods", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwMvOC6DhlcZJCT_QQUyjKHv1hacHEw9Mp5JOQ57UY3w&s=10" },
+        { id: 19, name: "Paldo Volcano Carbonara Noodle (4x130g)", price: 234, category: "pantry", catLabel: "Noodles", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7hb-ttyLkyv1X_EzDrJOnXQ6Ij1StDyjAM99GM0yl4g&s=10" },
+        { id: 20, name: "Delimondo Ranch Style Corned Beef (380G)", price: 189, category: "pantry", catLabel: "Canned Goods", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHqEsBuW77RRPq0LhsKfbcJfBUocv4t9SB_cca93w5yg&s=10" },
+	{ id: 21, name: "Prem Luncheon Meat Lite (340G)", price: 184, category: "pantry", catLabel: "Canned Goods", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3Tz8ofa-w5o2Byj7HiEZW29MDvQi10Cgi9EKzHvaY_g&s=10" },
+	{ id: 22, name: "Prem Luncheon Meat Reg (340G)", price: 184, category: "pantry", catLabel: "Canned Goods", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNP5G1_XQQFrYWNEg0tEdEqS_hUR6-Mqbfi9XTGaa5RQ&s=10" },
+	{ id: 23, name: "Spam Regular (340G)", price: 224, category: "pantry", catLabel: "Canned Goods", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEKjaJXlhwXss7WVjySBgwKTDFlqmrfbB8HaFeX7gevQ&s=10" },
+	{ id: 24, name: "Ring Cake Buy 1 Take 1", price: 379, category: "bakery", catLabel: "Baked", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfeesZC-NxruXKQephChcAcYOqL4lbiA8cWpRftCJiNw&s=10" },
+        { id: 25, name: "Keror Sparkling Red Grape (750mL)", price: 192, category: "alcohol", catLabel: "Alcohol & Wine", img: "https://www.snrshopping.com/upload/product/Keror-Sparkling-Red-Grape-750mL-11706/Keror%20Sparkling%20Red%20Grape%20750mL-O5k7nPujHu.png" },
+	{ id: 26, name: "Chivas Regal 12 YO Scotch Whiskey (1L)", price: 849, category: "alcohol", catLabel: "Alcohol & Wine", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWTmUYxdr-ikJEOBGrHCJOfi96YmV3li14MYZpQGwMTw&s=10" },
+	{ id: 27, name: "John Jameson Irish Whiskey (1L)", price: 799, category: "alcohol", catLabel: "Alcohol & Wine", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgcWqNq1ADP6GilcSTz9q9kKyugUajs3hzzkjbIGw3bQ&s" },
+	{ id: 28, name: "Johnnie Walker Blended Scotch Whisky (1L)", price: 1099, category: "alcohol", catLabel: "Alcohol & Wine", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQul-VvK6hpi3u0aIgaAr4xSRncpZKV10x29mHuoXHOUQ&s=10" },
+	{ id: 29, name: "Alfonso 1 Light Brandy (1L)", price: 274, category: "alcohol", catLabel: "Alcohol & Wine", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJ7PGXfs2cyvlhCO_n0YgDxFCRTuo3upPzR1hStQHBlw&s=10" },
+	{ id: 30, name: "Johnnie Walker Red Label (1.75L)", price: 1289, category: "alcohol", catLabel: "Alcohol & Wine", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgbAq1IaaKy12EHQ0BbzU8gj4VU8cdB9gSh4fxSrB_Bg&s=10" },
+	{ id: 31, name: "Ocean Spray Cranberry Cran x Grape (1.89L)", price: 199, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2nLpJkqUVdDhrf3D0Q3A24EevZBudaCooQDNmC9ZW1A&s" },
+	{ id: 32, name: "Ocean Spray Cranberry Cran x Apple (1.89L)", price: 199, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGRWAccbewc9wDhmM7gBR5iBNEkkg8Mv1WG7883h-VsQ&s=10" },
+	{ id: 33, name: "Lotte Jeju MAndarin Orange Juice (1.5L)", price: 129, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSER-HqqGa5M0qOECmPsW3PC1BunUAIRXXImzjusKOeLg&s=10" },
+	{ id: 34, name: "Sunny D Tangy Original (1GAL)", price: 549, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU_Ae2xR2sQ8cUEvZv3Umk9z9MiFh3p-BTrd_Fcf3-CA&s=10" },
+	{ id: 35, name: "Tropicana Twister Orange (1L)", price: 59, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkTUE6Epim64-cF6VXri1yxeD8KkLNIK6-lilHoejDDw&s=10" },
+	{ id: 36, name: "Member's Value Washed Sugar (2KG)", price: 165, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRvj19Cmu1On3EzZGs25EPjVp3_b6ChraHrZ14jkfc0w&s=10" },
+	{ id: 37, name: "Member's Value  Sugar (2KG)", price: 172, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwiZyw7rr8hV5gKI_kj028OJM9P4Zsn4YAYiTlcwhuAg&s=10" },
+	{ id: 38, name: "Marisco Muscovado Sugar (1KG)", price: 155, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSj2akj2PJ7zVfyoF4AvSFsA2RMxYAUn0WhEcIkYHEkDg&s=10" },
+	{ id: 39, name: "Swiss Miss Dark Chocolate (31G x 8pcs)", price: 179, category: "pantry", catLabel: "Pantry Essentials", img: "https://down-ph.img.susercontent.com/file/ph-11134201-7r98v-lyg6x42u1wu24d" },
+	{ id: 40, name: "Milo Chocolate Drink (1KG)", price: 288, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTb6uM-uuWk1H9wHzPDvJg0krpmuPBFKbZLS4XxUKYw9w&s=10" },
+	{ id: 41, name: "Gold Kili Instant Ginger Turmeric Drink (20 x 16G)", price: 179, category: "pantry", catLabel: "Pantry Essentials", img: "https://down-ph.img.susercontent.com/file/ph-11134207-820l9-mol1wqkjszy950" },
+	{ id: 42, name: "Gold Kili Instant Ginger Lemon Drink (20 x 18G)", price: 199, category: "pantry", catLabel: "Pantry Essentials", img: "https://goldkili.com/wp-content/uploads/2025/01/Instant-Ginger-Lemon-Drink.jpg" },
+	{ id: 43, name: "Arla Milky Goodness Strawberry Milk (1L)", price: 115, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQz3Wjly_S2q_JZd4UHa8OG4EOzHAFledaKhCatXWJaRA&s=10" },
+	{ id: 44, name: "Arla Milky Goodness Chocolate Milk (1L)", price: 115, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgTk27kwZt6nBz_kIiPfHlHhTp_HViChXSHiDmcyBQLA&s=10" },
+	{ id: 45, name: "Arla Milky Goodness Full Cream Milk (1L)", price: 140, category: "pantry", catLabel: "Pantry Essentials", img: "https://www.arla.ph/497d31/globalassets/arla-ph/product-packshots/arla-milk-goodness/full-cream-1l-388106.png?preset=ogbg,border20,background-color11" },
+	{ id: 46, name: "Cowhead Premium Chocolate Milk (1L)", price: 123, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRv0LqNSuJOG8ueDm_e0n6afdP-4Nrqt43t2sXH70Qhrg&s=10" },
+	{ id: 47, name: "Cowhead Premium Strawberry Milk (1L)", price: 123, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSK1cihZqyMgcyJBB8sk64ww-aEpP4IVCHON_CswLDO7g&s=10" },
+	{ id: 48, name: "Cacaolat Original Minibricks (6/200ML)", price: 214, category: "pantry", catLabel: "Pantry Essentials", img: "https://www.snrshopping.com/upload/product/Cacaolat-Mini-Bricks-Cocoa-Milk-Drink-6pcs-x-200ml-10431/Cacaolat%20Mini%20Bricks%20Cocoa%20Milk%20Drink%206pcs%20x%20200ml-0nOkyoTOY0.jpg" },
+	{ id: 49, name: "Cacaolat Original (275L)", price: 69, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQx7X5N-845Gzs5tAEeqXTzSRYwKcU9MEoxYbf2tWgA4A&s=10" },
+	{ id: 50, name: "Nescafe Creamy White (20/20G)", price: 174, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnFzZ1ymS7TPqPeW4gg3IIj2rJCU3M92quswMlrLl_xw&s=10" },
+	{ id: 51, name: "Nescafe Original (20/20G)", price: 154, category: "pantry", catLabel: "Pantry Essentials", img: "https://images.freshop.ncrcloud.com/1764405684715212070/3b1097bdf6bf9b8c024fa2ce266902ae_large.png" },
+	{ id: 52, name: "Gold Kili 3 in 1 Coffee Low Fat (30/18G)", price: 234, category: "pantry", catLabel: "Pantry Essentials", img: "https://goldkili.com/wp-content/uploads/2025/01/Gold-Kili-Instant-3-in-1-Coffee-Mix.jpg" },
+	{ id: 53, name: "Gold Kili 3 in 1 Coffee Less Sugar (25/18G)", price: 224, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQt8bnfVN7d9GxzcxxCvDMg1XocJo3KgVUXjGONugQX3w&s=10" },
+	{ id: 54, name: "Good Day Grande White Coffee (30/25G)", price: 189, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAh5UIFirE4Zx-61W9Uodq0CaHR-m6V1LGw5o1S9yNyg&s=10" },	
+	{ id: 55, name: "Good Day Grande Cappuccino With Cocoa Granule (30/25G)", price: 199, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXoDfcWIiTJzUNR5MHQP7FsaOeoeoCPwZsStJdKY7kCw&s=10" },
+	{ id: 56, name: "Nescafe Tradicao Forte Buy 1 Take 1 (200G)", price: 619, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRn3HItfjHC_Y5ip_tklmf3WkJ2BOsBSFAop_I8cVjf0A&s" },
+	{ id: 57, name: "Baroni Wafers Alla Nocciola Buy 1 Take 1 (400G)", price: 339, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZDQKFkC6-Q_hWZJpTgss78wIicWGyVHsIlYRXPna-Ww&s=10" },
+        { id: 58, name: "Delico Butter Cookies Wafer Buy 1 Take 1 (300G)", price: 199, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrS004sjdaoj0C9O7W0PESvlGKjYUBXUsPYKiK6YJyRA&s" },
+	{ id: 59, name: "Delico Chocolate Peanut Wafer Buy 1 Take 1 (300G)", price: 199, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7uY7Es1PEEorvJhoBGzmM3XNh3MRe1myebD_3XoR07g&s=10" },
+	{ id: 60, name: "Maya Hotcake Mix Fluffy N' Tasty (3/500G)", price: 178, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbSG9E2v2jtqdLJw3U-oJhRXHn3iDTg9GrzY1uhiQbGw&s=10" },
+	{ id: 61, name: "Skippy Chunky Peanut Butter (1.36KG)", price: 498, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZdas7jKGVAOG4Zh-3qxBRU5CWwZq2X2qOu_k9trDZAg&s=10" },
+	{ id: 62, name: "Skippy Creamy Peanut Butter (1.36KG)", price: 477, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhOCRaPdRwo5iVUul_F5YGgH3xuxJfuqtP3uqlkQmFuA&s=10" },
+	{ id: 63, name: "Member's Value Peanut Butter Creamy (800G)", price: 169, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsmTrjWufU-aTv7ltMHGMJlcn8qSYFoPPEer2XOO-Adw&s=10" },
+	{ id: 64, name: "Member's Value Peanut Butter Crunchy (800G)", price: 169, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRimXHHLP3Z5FqraPyRnYCHrGaAtaWWoDGQkdheutqV3w&s=10" },
+	{ id: 65, name: "Arla Cheesy Spread (500G)", price: 238, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqW3xAnuopSQ0DFsWbF_JbiD4XgJe3zMyH20KESnAMww&s=10" },
+	{ id: 66, name: "Ladies Choice Sandwich Spread (700ML)", price: 289, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8ipOSuHiDWKgiuBE6R70wkbPGgHz6gmFaTfzp_2tbtw&s=10" },
+	{ id: 67, name: "Eden Cheese Original (430G)", price: 145, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVtGNxtyLVbhAFoMm1PeowG5ooSSgW0R2NQPu848r2Uw&s=10" },
+	{ id: 68, name: "Ladies Choice Chicken Spread (470ML)", price: 261, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS69CQ6ImLv4cXPLmqA3cQ_4FSMVKlTTlhorzmhvf1-_g&s=10" },
+	{ id: 69, name: "Magnoloa Quickmelt Cheese (900G)", price: 388, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEFnFwB-fCGTl29waxQ-jf40-mCgt4X4SKb4XHCpSmRQ&s=10" },
+	{ id: 70, name: "Riesen Choco Caramel XXL (377G)", price: 279, category: "snacks", catLabel: "Chocolates", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYkFBjdpdOA3TUx732knQaBP7rHDNvkCIQGGeyJhDJQw&s=10" },
+	{ id: 71, name: "Kitkat Mini's Bag (200G)", price: 158, category: "snacks", catLabel: "Chocolates", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZW41kIcasI_LuC1FmoozLcZZ-bSrEpFuMvAvP53ET7Q&s=10" },
+	{ id: 72, name: "Snickers Mini's Bag (333G)", price: 269, category: "snacks", catLabel: "Chocolates", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN5l6HQR9WyW1lgSEDGfHa_DCgBZy9M5I0TNc8l9mKXQ&s=10" },
+	{ id: 73, name: "Almond Choco Ball 2 Layer (3/46G)", price: 199, category: "snacks", catLabel: "Chocolates", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoqJFB7Gi7ucYu0aC5V3MYqXDJd3VxvS0kYPQbiAmhLEeWRwE6_JYsViMT&s=10" },
+	{ id: 74, name: "Lotte ABC Milk Chocolate (565G)", price: 479, category: "snacks", catLabel: "Chocolates", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShUWTclZyXg_KEOKkAVjH3tQiAebkseSLnBvZ2d-is7A&s=10" },
+	{ id: 75, name: "Cocon Salt And Lemon Candy (150G)", price: 62, category: "snacks", catLabel: "Candy", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQu2fOQVicLigvXV_JcwwbLoI2-jRnEmwV7MkVwRWVKqA&s=10" },
+	{ id: 76, name: "Patrick Choco Cream Filled Biscuits (500G)", price: 259, category: "snacks", catLabel: "Biscuits", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0Q6M5S-TxnKUTUmO5PmtAbteZCjTxgaOjoRMDNO9Oow&s=10" },
+	{ id: 77, name: "Bergen Matcha Cookies (128G)", price: 99, category: "snacks", catLabel: "Biscuits", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoj0NOTzHzVz4ot6LEr4feH2us7_UiVoykAbUdeE4Qpw&s=10" },
+	{ id: 78, name: "Bergen Cookies Peanut Butter (96G)", price: 129, category: "snacks", catLabel: "Biscuits", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGFnIn2ACucPMXXPDuRRPd_zEyhU4IdHVwYeRLPl3hXA&s=10" },
+	{ id: 79, name: "Bergen Cookies Peanut Butter Buy 1 Take 1 (96G)", price: 129, category: "snacks", catLabel: "Biscuits", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGFnIn2ACucPMXXPDuRRPd_zEyhU4IdHVwYeRLPl3hXA&s=10" },
+	{ id: 80, name: "Bergen Cookies And Cream Buy 1 Take 1 (96G)", price: 129, category: "snacks", catLabel: "Biscuits", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcpJ8IdgVd7wIZgzhkkKGqBeQnk776c2g1APTIAXXiwA&s" },
+	{ id: 81, name: "Cadbury Choco Coated Oreo Buy 1 Take 1 (281G)", price: 329, category: "snacks", catLabel: "Biscuits", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJ_QYVRK960SGw66SESLUGuMMump_YEfc0UHrfQPqi9g&s=10" },
+	{ id: 82, name: "Lotte Pepero Pretzel Original (8/30G)", price: 289, category: "snacks", catLabel: "Biscuits", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYwspM5k8ll_8mk40XDKmEBibjPdAU4x4Uhbxl4PMFvg&s=10" },
+	{ id: 83, name: "Member's Value Banana Chips (600G)", price: 289, category: "snacks", catLabel: "Chips", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1oyOhY9ubA9aXXPRutqmKZbYEA9uiDN-9WS_yPD3ABw&s=10" },
+	{ id: 84, name: "Member's Value Roasted Cashew Salted (454G)", price: 389, category: "snacks", catLabel: "Nuts", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu3X4H0RMI-clIiwVbONDZo6FIyiMDjvnP84lu-VBvJA&s" },
+	{ id: 85, name: "Calbee Honey Butter (340G)", price: 249, category: "snacks", catLabel: "Chips", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpyUAgox6LcFV3RAW4exFmRsRtCMiSBLggenwkzlLXTQ&s=10" },
+	{ id: 86, name: "Country Bites Corn Pops (520G)", price: 174, category: "snacks", catLabel: "Chips", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGuY15irMYsIUjf5f1kGMSwKvQLZ8N3YX0tIsQyGSYYw&s=10" },
+	{ id: 87, name: "Cacaolat Original Zero Sugar (1L)", price: 189, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMLj2OX8CBP1Ijnr6ZbUQrttrOkGnILutCXXtG_lQwhQ&s=10" },
+	{ id: 88, name: "Dark Cafe Iced Coffee Latte (250ML)", price: 39, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRt2fOzTtmhfSgg4sl5oAsNiyUSE9O8hZMX_utCKhaB3g&s=10" },
+	{ id: 89, name: "Member's Value Ethyl Alcohol 70% (1L)", price: 159, category: "Health And Medical", catLabel: "Antiseptic & Disinfectant", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmEbXFG_jYTMWrq_DKNB5gF3taP_8O0jliGmNsV9nn4Q&s=10" },
+	{ id: 90, name: "Member's Value Ethyl Alcohol 70% (500ML)", price: 70, category: "Health And Medical", catLabel: "Antiseptic & Disinfectant", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7j6X309LPx8kTcbI8TSgIY9-gIfGdxxIQvkrKcQJYkg&s=10" },
+	{ id: 91, name: "Member's Antibacterial Hand Soap Shea Butter (1GAL)", price: 449, category: "Health And Medical", catLabel: "Antiseptic & Disinfectant", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcl3WtiqP9cwdQXXR-yiD8Q4ST-2hrXnBSd7j2YC6zjA&s=10" },
+	{ id: 92, name: "Palmolive Shampoo Intensive Moist (600ML)", price: 304, category: "Personal Care", catLabel: "Shampoo", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTw8hveEmZI9--xDpMtnBUovg2knouhLuY64mtCMlVMkg&s=10" },
+	{ id: 93, name: "Palmolive Shampoo Ultra Smooth (600ML)", price: 304, category: "Personal Care", catLabel: "Shampoo", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlWVXQcb-rVnNehgDtmGbAQ8tme4SgCXjAQ2PAuRloaQ&s=10" },
+	{ id: 94, name: "Sunsilk Shampoo Br Shine (700ML)", price: 339, category: "Personal Care", catLabel: "Shampoo", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmRTQ4zuox4Xj2e2R0_NnuI1WxCJ-ey70FhZDWuCmuYA&s=10" },
+	{ id: 95, name: "Pantene Total Damage Care Shampoo (900ML)", price: 559, category: "Personal Care", catLabel: "Shampoo", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFbe-aCHurDLgy3X8T-D_Yi2WZOI_xW1hJLfWmQODYdQ&s=10" },
+	{ id: 96, name: "Head & Shoulder Smooth & Silky Shampoo", price: 659, category: "Personal Care", catLabel: "Shampoo", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtLpL0PQqcsJPrFr4dC1_z2AyDLpIk6KRlRt_tGk6DEQ&s=10" },
+	{ id: 97, name: "Johnson;s Baby Shampoo Original (750ML)", price: 379, category: "Personal Care", catLabel: "Shampoo", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4-MuCi26lXQt05rBTAza5UqszvXEUXJ9XLuz5gjSRAg&s" },
+	{ id: 98, name: "Pantene 3 Minutes Miracle Conditioner (480ML)", price: 399, category: "Personal Care", catLabel: "Conditioner", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWW83yuGk_zNr72TYduGIhy7Gim-1PnsPza9uQU4YQ7Q&s=10" },
+	{ id: 99, name: "Colgate Toothpaste Triple Action (226g)", price: 169, category: "Personal Care", catLabel: "Toothpaste", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxMQ5qoZsFsdky4guaG737CB1lzTjFoUR1czoiLpzKtg&s" },
+	{ id: 100, name: "Colgate Toothpaste Spicy Fresh (4/173G)", price: 309, category: "Personal Care", catLabel: "Toothpaste", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7_z4xm36gUTLiQIOyySiBzH5FtNaGI9HHq48D-YFGNQ&s=10" },
+	
+    ];
+    
+    let cart = [];
+    let currentOrderSummary = '';
+    
+    // Render products
+    const productsGrid = document.getElementById('products-grid');
+    products.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.dataset.searchText = `${product.name} ${product.catLabel}`.toLowerCase(); // Para sa search
+        card.innerHTML = `
+            <img src="${product.img}" alt="${product.name}" loading="lazy" onerror="this.style.display='none'">
+            <span class="category-chip cat-${product.category}">${product.catLabel}</span>
+            <div class="product-name">${product.name}</div>
+            <div class="price-tag">&#8369;${product.price.toFixed(2)}</div>
+            <button class="add-btn" data-id="${product.id}">Idagdag sa Kariton</button>
+        `;
+        productsGrid.appendChild(card);
+    });
+
+    // 🔍 SEARCH FUNCTION
+    const searchInput = document.getElementById('search-input');
+    searchInput.addEventListener('input', filterProducts);
+    
+    function filterProducts() {
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        const cards = productsGrid.querySelectorAll('.product-card');
+        let visibleCount = 0;
+        
+        cards.forEach(card => {
+            const text = card.dataset.searchText;
+            if (searchTerm === '' || text.includes(searchTerm)) {
+                card.classList.remove('hidden');
+                visibleCount++;
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+        
+        // Mensahe kung walang nahanap
+        let noResultsMsg = productsGrid.querySelector('.no-results');
+        if (visibleCount === 0) {
+            if (!noResultsMsg) {
+                noResultsMsg = document.createElement('div');
+                noResultsMsg.className = 'no-results';
+                noResultsMsg.textContent = 'Walang nakitang produkto na tumutugma sa iyong hinanap 😔';
+                productsGrid.appendChild(noResultsMsg);
+            }
+        } else {
+            if (noResultsMsg) noResultsMsg.remove();
+        }
+    }
+    // --- END SEARCH FUNCTION ---
+    
+    // Update product count
+    document.getElementById('product-count').textContent = products.length;
+    
+    // Add to cart
+    document.querySelectorAll('.add-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = parseInt(btn.getAttribute('data-id'));
+            const product = products.find(p => p.id === id);
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            updateCartDisplay();
+        });
+    });
+    
+    // Update cart display
+    function updateCartDisplay() {
+        const cartItems = document.getElementById('cart-items');
+        cartItems.innerHTML = '';
+        
+        if (cart.length === 0) {
+            cartItems.innerHTML = '<p class="empty-cart">Wala pang laman ang kariton</p>';
+            document.getElementById('total-price').textContent = '0.00';
+            return;
+        }
+        
+        let total = 0;
+        cart.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            const div = document.createElement('div');
+            div.className = 'cart-item';
+            div.innerHTML = `
+                <div style="flex:1;min-width:0;">
+                    <div style="font-weight:600;font-size:13px;line-height:1.3;">${item.name}</div>
+                    <div style="font-size:12px;color:var(--muted);margin-top:2px;">
+                        &#8369;${item.price.toFixed(2)} x ${item.quantity} = <strong style="color:var(--text);">&#8369;${itemTotal.toFixed(2)}</strong>
+                    </div>
+                </div>
+                <button class="remove-btn" data-index="${index}">Alisin</button>
+            `;
+            cartItems.appendChild(div);
+        });
+        
+        document.getElementById('total-price').textContent = total.toFixed(2);
+        
+        document.querySelectorAll('.remove-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const idx = parseInt(btn.getAttribute('data-index'));
+                cart.splice(idx, 1);
+                updateCartDisplay();
+            });
+        });
+    }
+    
+    // Modal handlers
+    const infoModal = document.getElementById('info-modal');
+    const summaryModal = document.getElementById('summary-modal');
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const proceedBtn = document.getElementById('proceed-payment');
+    const closeSummaryBtn = document.getElementById('close-summary-btn');
+    const openMessengerBtn = document.getElementById('open-messenger-btn');
+    const copySummaryBtn = document.getElementById('copy-summary-btn');
+    
+    checkoutBtn.addEventListener('click', () => {
+        if (cart.length === 0) {
+            alert('Walang laman ang iyong kariton!');
+            return;
+        }
+        infoModal.classList.add('show');
+        hideAllErrors();
+    });
+    
+    cancelBtn.addEventListener('click', () => {
+        infoModal.classList.remove('show');
+        clearForm();
+    });
+    
+    proceedBtn.addEventListener('click', async () => {
+        hideAllErrors();
+        
+        const fullname = document.getElementById('fullname').value.trim();
+        const address = document.getElementById('address').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const membership = document.getElementById('membership').value.trim() || 'Wala';
+        
+        let isValid = true;
+        if (!fullname) { document.getElementById('name-error').style.display = 'block'; isValid = false; }
+        if (!address) { document.getElementById('address-error').style.display = 'block'; isValid = false; }
+        if (!phone || !/^09\d{9}$/.test(phone.replace(/\D/g, ''))) {
+            document.getElementById('phone-error').style.display = 'block';
+            isValid = false;
+        }
+        if (!isValid) return;
+        
+        const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const orderList = cart.map(i => 
+            `${i.name} - ₱${i.price.toFixed(2)} x ${i.quantity} = ₱${(i.price*i.quantity).toFixed(2)}`
+        ).join('\n');
+        
+        currentOrderSummary = `BUOD NG ORDER - S&R Membership Shopping
+----------------------------------------
+${orderList}
+----------------------------------------
+KABUUAN: ₱${total.toFixed(2)}
+IMPORMASYON NG BUMIBILI:
+Pangalan: ${fullname}
+Tirahan: ${address}
+Telepono: ${phone}
+S&R Membership #: ${membership}`;
+        
+        // Send email
+        if (EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'pk_xxxxxxxxxxxx') {
+            try {
+                await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                    fullname: fullname,
+                    address: address,
+                    phone: phone,
+                    membership: membership,
+                    order: orderList,
+                    total: '₱' + total.toFixed(2)
+                });
+                console.log('Email naipadala!');
+            } catch (e) {
+                console.log('Hindi naipadala ang email:', e);
+                alert('Nakatala na ang order! Ngunit hindi naipadala ang email — kopyahin na lamang ang buod.');
+            }
+        }
+        
+        // Show summary modal
+        infoModal.classList.remove('show');
+        document.getElementById('order-summary-text').textContent = currentOrderSummary;
+        summaryModal.classList.add('show');
+        
+        cart = [];
+        updateCartDisplay();
+        clearForm();
+    });
+    
+    // Copy summary
+    copySummaryBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(currentOrderSummary).then(() => {
+            copySummaryBtn.textContent = '✅ Nakopya na!';
+            setTimeout(() => {
+                copySummaryBtn.textContent = '📋 Kopyahin ang Buod';
+            }, 2000);
+        }).catch(() => {
+            alert('Hindi makopya — piliin at kopyahin nang mano-mano ang teksto.');
+        });
+    });
+    
+    // Open Messenger
+    openMessengerBtn.addEventListener('click', () => {
+        window.open(MESSENGER_LINK, '_blank');
+    });
+    
+    // Close summary
+    closeSummaryBtn.addEventListener('click', () => {
+        summaryModal.classList.remove('show');
+        currentOrderSummary = '';
+    });
+    
+    function hideAllErrors() {
+        document.querySelectorAll('.error-text').forEach(el => el.style.display = 'none');
+    }
+    
+    function clearForm() {
+        document.getElementById('fullname').value = '';
+        document.getElementById('address').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('membership').value = '';
+        hideAllErrors();
+    }
+})();
+</script>
+</body>
+</html>
