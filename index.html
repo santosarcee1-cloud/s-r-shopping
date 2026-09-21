@@ -444,7 +444,7 @@
     // ==============================================
     // CONFIGURATION — PALITAN ANG MGA NAKASAAD DITO
     // ==============================================
-    const MESSENGER_LINK = 'https://www.facebook.com/arcee.santos.14'; 
+    const MESSENGER_LINK = 'https://m.me/arceesantos.14';
     const EMAILJS_PUBLIC_KEY = '_weUCF_qXYkfbQjRa';
     const EMAILJS_SERVICE_ID = 'Jh5tBtuBaT56RkT78k6kh';
     const EMAILJS_TEMPLATE_ID = 'template_vmi3ypn';
@@ -700,7 +700,7 @@
         const fullname = document.getElementById('fullname').value.trim();
         const address = document.getElementById('address').value.trim();
         const phone = document.getElementById('phone').value.trim();
-        const membership = document.getElementById('membership').value.trim() || 'Wala';
+        const membership = document.getElementById('membership').value.trim() || 'None';
         
         let isValid = true;
         if (!fullname) { document.getElementById('name-error').style.display = 'block'; isValid = false; }
@@ -716,7 +716,7 @@
             `${i.name} - ₱${i.price.toFixed(2)} x ${i.quantity} = ₱${(i.price*i.quantity).toFixed(2)}`
         ).join('\n');
         
-        currentOrderSummary = `SUMMARY OF YOUR ORDER - S&R Membership Shopping
+        currentOrderSummary = `SUMMARY OF YOUR ORDER - K&A S&R PasaBUY Shopping
 ----------------------------------------
 ${orderList}
 ----------------------------------------
