@@ -132,8 +132,14 @@
     }
     .product-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-color: var(--accent); }
     .product-card img {
-        width: 100%; height: 160px; object-fit: cover; border-radius: 10px;
-        margin-bottom: 12px; background: #f1f5f9; cursor: pointer;
+        width: 100%;
+        height: 160px;
+        object-fit: contain;
+        border-radius: 10px;
+        margin-bottom: 12px;
+        background: #f1f5f9;
+        cursor: pointer;
+        padding: 8px;
     }
     .quick-view-overlay {
         position: absolute; top: 14px; left: 14px; right: 14px; height: 160px;
@@ -289,7 +295,15 @@
     }
     .gcash-number .name { color: var(--success); font-size: 12px; }
     
-    .quick-view-img { width: 100%; height: 280px; object-fit: cover; border-radius: 10px; margin-bottom: 16px; background: #f1f5f9; }
+    .quick-view-img {
+        width: 100%;
+        height: 280px;
+        object-fit: contain;
+        border-radius: 10px;
+        margin-bottom: 16px;
+        background: #f1f5f9;
+        padding: 12px;
+    }
     .quick-view-name { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
     .quick-view-price { font-size: 28px; font-weight: 700; color: var(--accent); margin-bottom: 16px; }
     .quick-view-category { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
@@ -700,20 +714,18 @@
         { id: 101, name: "S&R Muffins Buy 1 Take 1", price: 379, category: "bakery", catLabel: "Bakery & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQG3yEqB3KCIcyWxZishAUQRb0uis0-3SDe7snm4_o8mQ&s=10" },
         { id: 102, name: "Member's Value Laundry Detergent Powder Floral (7KG)", price: 599, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_7802RTRdGBHe1nrpUUFdyJOFi3bLa-w-2Tm0wSaw_A&s=10" },
         { id: 103, name: "Member's Value Liquid Laundry Detergent (2.5L Pouch)", price: 274, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8B3S0vccyUW0wATcmoF4hmXEjN1C_n-gGfCpsCRxi1w&s=10" },
-	{ id: 104, name: "Member's Value Dishwashing Lemon Pouch (2.5L Pouch)", price: 199, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTM0iL-EdETt9yS05qZTQvqoulPZs858pgCyXVVNWPwnw&s=10" },
-	{ id: 105, name: "Member's Value Liquid Laudry Detergent (4L)", price: 409, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAPwumJOGgS_tDk-wF1gALDrJy3AnDEwg6Hl5sU2qAKw&s=10" },
-	{ id: 106, name: "Downy Antibac XL Refill (2.4L)", price: 462, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwCuaJHQbFsvwZEvJBARQ0A3g1Z6wnViDY9NHKZz1Fiw&s=10" },
-	{ id: 107, name: "Ariel Powder Detergent Bucket (9.05KG)", price: 1639, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlJ-GYwrkR9IPU-JPKJmsVJspvjMmiH9YWqGWOXbaxmg&s=10" },
-	{ id: 108, name: "Member's Value Fabric Conditioner (4L)", price: 379, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6uwa_kHortxdiIXIAAb6R7dRYoFT1cokhoUmIcZbwzw&s=10" },
-	{ id: 109, name: "Member's Value Powder Detergent (10KG)", price: 859, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS56fdzcgtmYsGogD6QpCTyUepZJtqs4eGpYWRdH8i0lA&s=10" },
-	{ id: 110, name: "Nescafe Gold (190G)", price: 564, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLDSJVh5BDt6v4gT8No8Mas1WucqzT8W3np4Zt-X2OSw&s" },
-	{ id: 111, name: "Ariel Sunrise Fresh Laundry Detergent (3.35KG)", price: 669, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThG5uuG1O6ehnNXiUtZqKg-vj1B0QemVApztVuVrh9gA&s=10" },
-	{ id: 112, name: "Milk Classic Rice Cracker Milk Flavor (240g)", price: 149, category: "snacks", catLabel: "Snacks & Treats", img: "https://www.snrshopping.com/upload/product/Milk-Classic-Rice-Cracker-Milk-Flavor-240g-14999/Milk%20Classic%20Rice%20Cracker%20Milk%20Flavor%20240g-UTxcPMJalK.png" },
-	{ id: 113, name: "Maltesers Fun Size (144g)", price: 222, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR--UfbRMkHNhie5BfRHpIfFatgfiZzKeEbyras6VVS8Q&s=10" },
-	{ id: 114, name: "Maltesers Bucket (565g)", price: 539, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrZpUcUrbr7KBtAkpAo-pGMXgsU21OGEJ_NsmkZoKuXA&s=10" },
-	{ id: 115, name: "Finca Andrade Malbec Buy 1 Take 1 (750ML)", price: 499, category: "alcohol", catLabel: "Beverages & Spirits", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSO91FEzyiOYyt6t4knnx2wYTrk3khTN4pUsQepfVpCog&s=10" },
-	
-	
+        { id: 104, name: "Member's Value Dishwashing Lemon Pouch (2.5L Pouch)", price: 199, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTM0iL-EdETt9yS05qZTQvqoulPZs858pgCyXVVNWPwnw&s=10" },
+        { id: 105, name: "Member's Value Liquid Laundry Detergent (4L)", price: 409, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAPwumJOGgS_tDk-wF1gALDrJy3AnDEwg6Hl5sU2qAKw&s=10" },
+        { id: 106, name: "Downy Antibac XL Refill (2.4L)", price: 462, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwCuaJHQbFsvwZEvJBARQ0A3g1Z6wnViDY9NHKZz1Fiw&s=10" },
+        { id: 107, name: "Ariel Powder Detergent Bucket (9.05KG)", price: 1639, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlJ-GYwrkR9IPU-JPKJmsVJspvjMmiH9YWqGWOXbaxmg&s=10" },
+        { id: 108, name: "Member's Value Fabric Conditioner (4L)", price: 379, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6uwa_kHortxdiIXIAAb6R7dRYoFT1cokhoUmIcZbwzw&s=10" },
+        { id: 109, name: "Member's Value Powder Detergent (10KG)", price: 859, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS56fdzcgtmYsGogD6QpCTyUepZJtqs4eGpYWRdH8i0lA&s=10" },
+        { id: 110, name: "Nescafe Gold (190G)", price: 564, category: "pantry", catLabel: "Pantry Essentials", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLDSJVh5BDt6v4gT8No8Mas1WucqzT8W3np4Zt-X2OSw&s" },
+        { id: 111, name: "Ariel Sunrise Fresh Laundry Detergent (3.35KG)", price: 669, category: "household", catLabel: "Laundry Soaps & Detergents", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThG5uuG1O6ehnNXiUtZqKg-vj1B0QemVApztVuVrh9gA&s=10" },
+        { id: 112, name: "Milk Classic Rice Cracker Milk Flavor (240g)", price: 149, category: "snacks", catLabel: "Snacks & Treats", img: "https://www.snrshopping.com/upload/product/Milk-Classic-Rice-Cracker-Milk-Flavor-240g-14999/Milk%20Classic%20Rice%20Cracker%20Milk%20Flavor%20240g-UTxcPMJalK.png" },
+        { id: 113, name: "Maltesers Fun Size (144g)", price: 222, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR--UfbRMkHNhie5BfRHpIfFatgfiZzKeEbyras6VVS8Q&s=10" },
+        { id: 114, name: "Maltesers Bucket (565g)", price: 539, category: "snacks", catLabel: "Snacks & Treats", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrZpUcUrbr7KBtAkpAo-pGMXgsU21OGEJ_NsmkZoKuXA&s=10" },
+        { id: 115, name: "Finca Andrade Malbec Buy 1 Take 1 (750ML)", price: 499, category: "alcohol", catLabel: "Beverages & Spirits", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSO91FEzyiOYyt6t4knnx2wYTrk3khTN4pUsQepfVpCog&s=10" }
     ];
     
     let products = [];
@@ -799,7 +811,7 @@
                     ${items.map(product => `
                         <div class="product-card" data-search-text="${(product.name + ' ' + product.catLabel).toLowerCase()}" data-id="${product.id}">
                             <button class="admin-edit-btn" data-edit-id="${product.id}" title="Edit Product">&#9998;</button>
-                            <img src="${product.img}" alt="${product.name}" loading="lazy" onerror="this.style.display='none'" class="product-img" data-img-id="${product.id}">
+                            <img src="${product.img}" alt="${product.name}" loading="lazy" onerror="this.style.visibility='hidden'" class="product-img" data-img-id="${product.id}">
                             <div class="quick-view-overlay" data-qv-id="${product.id}">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                                 Quick View
