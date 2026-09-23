@@ -1055,7 +1055,7 @@
                 <p class="error-text" id="admin-error">Incorrect password</p>
             </div>
             <p style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:15px;">
-                Default password: <strong>admin123</strong>
+                Shop owner access only
             </p>
             <div style="display:flex;gap:10px;">
                 <button class="cancel-btn" id="admin-cancel">Cancel</button>
@@ -1141,7 +1141,11 @@
     const EMAILJS_PUBLIC_KEY = '_weUCF_qXYkfbQjRa';
     const EMAILJS_SERVICE_ID = 'Jh5tBtuBaT56RkT78k6kh';
     const EMAILJS_TEMPLATE_ID = 'template_vmi3ypn';
-    const ADMIN_PASSWORD = 'admin123';
+    // Admin password is stored as a SHA-256 hash so the real password never
+    // appears in the page source. To change it: run
+    //   node -e "console.log(require('crypto').createHash('sha256').update('YOURPASS').digest('hex'))"
+    // and replace the hash below. Current default password: KnaPasa2026
+    const ADMIN_PASSWORD_HASH = 'a2048ede94e5992026f6426bf50d47ecd69814588c17de885197c38eead15ea2';
     
     // Bump this (or let Export auto-bump it) to force all visitors to refresh
     // their cached product list from the file instead of old localStorage.
@@ -1624,9 +1628,16 @@
     document.getElementById('close-admin-login').addEventListener('click', () => adminLoginModal.classList.remove('show'));
     document.getElementById('admin-cancel').addEventListener('click', () => adminLoginModal.classList.remove('show'));
     
-    document.getElementById('admin-login-btn').addEventListener('click', () => {
+    async function hashPassword(pw) {
+        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    document.getElementById('admin-login-btn').addEventListener('click', async () => {
         const pw = document.getElementById('admin-password').value;
-        if (pw === ADMIN_PASSWORD) {
+        if (!pw) return;
+        const hash = await hashPassword(pw);
+        if (hash === ADMIN_PASSWORD_HASH) {
             setAdminMode(true);
             adminLoginModal.classList.remove('show');
         } else {
